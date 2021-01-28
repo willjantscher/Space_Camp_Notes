@@ -314,12 +314,34 @@ definitions of terms
     - 
 
 
+1/28/2021 --------------------------------------------------------------------------------------------------------------------------------------------
 
 
+f12 - jump to location 
+shift f12 - show references
+ctrl f12 - go to implementation
+scripts attached to componenets = monobehavior
+if doesn't inhereit (injected) data handling class = 
+alt enter to bring in things (using ...) like ...
 
+crtl r, ctrl g will clean up your dependencies/directives
 
+Work with Rich and Andy
 
+class name must match file name
+to be attached to a sript, must be attached to another class : MonoBehaviour
+custom classes must be serialized
 
+serialized - 
+    - if contained in just one script, serialize (like in prefabs)
+    - essentially just brings the field into the Unity view (click and drag references)
+    - for base class
+    It means it's exposed in Inspector AND the value its set to will be saved in the scene file.
+
+alt click
+alct cntr click for multiline editing
+
+shift enter to return without sending in mattermost
 
 
 

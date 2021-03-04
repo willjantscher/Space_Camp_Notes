@@ -346,3 +346,276 @@ shift enter to return without sending in mattermost
 
 
 
+
+
+
+
+
+---------------------------------------------------------------------------------------------------------------------------------------------------------
+Working on Step 5 : https://confluence.il2.dso.mil/pages/viewpage.action?spaceKey=SC&title=Developer+Machine+Setup
+
+need to change the version of .net to 3.1.0
+
+
+
+It was not possible to find any compatible framework version
+The framework 'Microsoft.NETCore.App', version '3.1.0' was not found.
+  - The following frameworks were found:
+      5.0.2 at [/usr/local/share/dotnet/shared/Microsoft.NETCore.App]
+
+You can resolve the problem by installing the specified framework and/or SDK.
+
+The specified framework can be found at:
+  - https://aka.ms/dotnet-core-applaunch?framework=Microsoft.NETCore.App&framework_version=3.1.0&arch=x64&rid=osx.10.15-x64
+Get-Content: /Users/williamjantscher/Code/Cosmos/spacecockpit/pipeline/lint.ps1:23
+Line |
+  23 |  [xml]$xml = Get-Content -Path $lintReportPath
+     |              ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+     | Cannot find path
+     | '/Users/williamjantscher/Code/Cosmos/spacecockpit/src/test/coverage/lint_result.xml' because it does not exist.
+
+Linting Result: PASS
+PS /Users/williamjantscher/Code/Cosmos/spacecockpit/src> 
+
+
+
+
+
+
+
+
+
+SETING UP SONARQUBE
+https://confluence.il2.dso.mil/display/SC/Mini+Pipeline
+
+./pipelines/lint.ps1
+in powershell to run the mini pipeline
+    
+    admin1 is new password
+
+
+.NETFramework,Version=v4.7.1
+.NETFramework is not compatable on mac. Mono is a substitute, but need to run independant.
+
+install mono 
+---------------------------------------------------------------------------------------------------------------------------------------------------------
+ensure docker is running 
+running sonarscanner
+run in spacecockpit director
+    dotnet sonarscanner begin /k:"spacecockpit" /d:sonar.login="ae1fb9631a8d2925051cd0e08f5b07312cc089fe"
+    msbuild src/src.sln
+    dotnet sonarscanner end /d:sonar.login="ae1fb9631a8d2925051cd0e08f5b07312cc089fe"
+
+    dotnet sonarscanner begin /k:"<product-key>" /d:sonar.login="<token>"
+    msbuild src/src.sln
+    dotnet sonarscanner end /d:sonar.login="<token>"
+---------------------------------------------------------------------------------------------------------------------------------------------------------
+
+https://code.il2.dso.mil/spacecamp/saber/theia/spacecockpit/archive
+
+clone kafka-dev-tools and spacecockpit-API
+
+
+
+
+
+
+==> Caveats
+To have launchd start kafka now and restart at login:
+  brew services start kafka
+Or, if you don't want/need a background service you can just run:
+  zookeeper-server-start /usr/local/etc/kafka/zookeeper.properties & kafka-server-start /usr/local/etc/kafka/server.properties
+
+
+
+zookeeper-server-start /Users/williamjantscher/Code/kafka-dev-tools/Kafka/bin/windows/zookeeper-server-start.bat
+kafka-server-start /usr/local/etc/kafka/server.properties
+
+KAFKA ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+At directory: /Users/williamjantscher/Code/kafka-dev-tools/Kafka
+/Kafka/bin/windows/zookeeper-server-start.bat /Kafka/config/zookeeper.properties
+    zookeeper-server-start /Users/williamjantscher/Code/kafka-dev-tools/Kafka/config/zookeeper.properties
+
+./Kafka/bin/windows/kafka-server-start.bat /Kafka/config/server.properties
+    kafka-server-start /Users/williamjantscher/Code/kafka-dev-tools/Kafka/config/server.properties
+
+./Kafka/bin/windows/kafka-console-consumer.bat --bootstrap-server localhost:9092 --topic elsetsOutput --from-beginning
+    kafka-console-consumer --bootstrap-server localhost:9092 --topic elsetsOutput --from-beginning
+
+open the Kafka Tool Gui
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+https://confluence.il2.dso.mil/pages/viewpage.action?spaceKey=SPAC&title=Accessing+Space+Cockpit+Locally
+
+
+cmnd m cmnd l will show/hide/minimize in vs
+
+f12 goes to definitions
+shift f12 goes to implementations
+
+
+sonarqube working on mac
+working on getting 
+
+kafka working on mac, individual can get running, DllNotFoundException when trying to run solution to boot the gui, 
+
+
+
+
+
+spacecockpitsceneinstaller
+setup for zenject stuff (and pooling)
+points to where to find things
+
+
+getcomponent is an expensive operation
+
+ctrl r r will rename all instances of that 
+cmnd r r
+
+IPM 
+Iteration planning meeting
+provide estimate for new tickets
+assign value (how much deve effort)
+used to track velocity
+fibonacci numbers up to 21, 
+assign numbers individually
+5 is 1-2 days
+8 is about a day to 3 days ish
+13 is week to 1.5 weeks
+1, 2, 3, 5, 8, 13, 21, ...
+switch to sprint planning   
+    what will go into the next sprint
+
+
+
+
+
+AppModel.cs stores all data (come in from data source or has been created)
+
+Dragon electronic assembly?
+
+
+alert icon
+needs hover affect
+create prefab? copy from existing/modify existing
+
+
+viewmodel controls behavior of the views
+views are the class objects popups
+    these only have data, and are dictated by the viewmodel
+
+
+
+Work on the asset list stuff (editors etc.)
+help prompt updates
+edit text input field 
+
+carot position on master
+
+editable label field
+
+menu offsets, revealed gound station hover bug, context menu
+Asset list confusion on deletion bug 
+
+
+bug in the my assets list as well as a similar bug with the filtered data rows when deleting from the edit asset list
+
+sprites for cursors, CATs angle, etc...
+
+
+
+Setup for nps setup
+
+git clone https://code.il2.dso.mil/spacecamp/saber/consus/node-pub-sub.git --recurse-submodules
+in node-pub-sub
+
+put keys in .env files
+
+make sure ingest is updated
+
+Hover for visibility icon in assetlist
+CATS angle ticket (fixes from Claire)
+
+Sensor info window
+
+
+
+
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+Meeting with sam Kreimier Thursday at 8:30 AM MST
+https://us02web.zoom.us/j/82114303768
+
+Jackie Smith
+Sam Kreimier
+
+Follow-on?
+
+end of Space Camp???
+April 16?
+conversation with stake holders
+    -talk to pm/Nathen
+    -talk to commander
+
+"stay on with Space Camp"
+Buckley article on Delta 4 super coders
+
+Presentations at the end of the Cohert??
+10-15 min demo of the project we worked on? Do 1-2 weeks before the end of the cohert??
+
+present to commander all the things we learned, talk about the process and what we did...
+use videos of space cockpit, screenshots?
+talk about the timeline 
+
+MSgt Angler
+Chief Belton
+
+New AFSC? New SEI???
+
+CSO, Chief Toberman, General Crider
+want agile/adaptable structure...
+16K AFSC for officers? or a Z prefix? 
+our names are on a list, we are being tracked...
+TSL?
+
+Coding projects when returning to the squadron????
+Good POC?
+Documentation?
+
+hardware and permissions?
+
+How to work on programs when returning to my unit???
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

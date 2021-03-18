@@ -587,6 +587,317 @@ hardware and permissions?
 
 How to work on programs when returning to my unit???
 ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+work on bug where selecting all assets causes crash...
+work on integration of sensor window - 
+
+//find out how many are already selected,
+loop through first entries, select if unselected, increase conjunctions
+//send notificication only 50
+
+
+		public List<IDataRowViewModel> GetFilteredViewModels()
+		{
+			return ViewModels;
+		}
+
+
+insert onlyh 50 assets, select all toggle
+Sonar issues and failing tests
+
+
+
+clicking on an asset in scene does not switch the tab to sat/gs but it does select the infowindow;
+if no sats added to scene/ no gs added, go to tab with assets.
+    go to whichever is changed
+
+_openSatelliteCatalogueButton.onClick.AddListener(() => OpenCatalogRequested?.Invoke("Satellites"));
+_openGroundStationCatalogueButton.onClick.AddListener(() => OpenCatalogRequested?.Invoke("GroundStations"));
+
+
+
+
+
+
+
+
+
+
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using UI.CommonControls.Grid.Adapters;
+using UI.Filter;
+using UnityEngine;
+using UnityEngine.UI;
+
+namespace UI.CommonControls.Grid.Custom
+{
+    public class SatelliteFilterHeaderRow : HeaderRow
+    {
+        [SerializeField] private DataColumnHeader _satIdHeaderCell = default;
+        [SerializeField] private DataColumnHeader _satNameHeaderCell = default;
+        [SerializeField] private DataColumnHeader _satNicknameHeaderCell = default;
+        [SerializeField] private DataColumnHeader _satRegimeHeaderCell = default;
+        [SerializeField] private DataColumnHeader _selectedHeaderCell = default;
+        [SerializeField] private Toggle _selectedToggle = default;
+
+        private SatFilterUI _satFilter;
+        private AssetListEditor.AssetListEditor _assetListEditor;
+
+        public override void Initialize(DataGrid parentGrid)
+        {
+            base.Initialize(parentGrid);
+
+            _selectedHeaderCell.OnHeaderClicked += SortByColumn;
+            _selectedHeaderCell.GetValueFunc = GetSelectedHeaderCell;
+            _selectedHeaderCell.Initialize();
+            _satIdHeaderCell.OnHeaderClicked += SortByColumn;
+            _satIdHeaderCell.GetValueFunc = GetSatIdHeaderCell;
+            _satIdHeaderCell.Initialize();
+            _satNameHeaderCell.OnHeaderClicked += SortByColumn;
+            _satNameHeaderCell.GetValueFunc = GetSatNameHeaderCell;
+            _satNameHeaderCell.Initialize();
+            _satNicknameHeaderCell.OnHeaderClicked += SortByColumn;
+            _satNicknameHeaderCell.GetValueFunc = GetSatNicknameHeaderCell;
+            _satNicknameHeaderCell.Initialize();
+            _satRegimeHeaderCell.OnHeaderClicked += SortByColumn;
+            _satRegimeHeaderCell.GetValueFunc = GetSatRegimeHeaderCell;
+            _satRegimeHeaderCell.Initialize();
+
+            _selectedToggle.onValueChanged.AddListener(HandleSelectAllValueChanged);
+
+            ParentGrid.OnDataSourceChanged += HandleGridDataSourceChanged;
+
+            _satFilter = transform.root.gameObject.GetComponentInChildren<SatFilterUI>();
+            _assetListEditor = transform.root.gameObject.GetComponentInChildren<AssetListEditor.AssetListEditor>();
+        }
+
+        private IComparable GetSatRegimeHeaderCell(IDataRowViewModel arg)
+        {
+            return (arg as SatelliteFilterDataRowViewModel)?.Regime ?? string.Empty;
+        }
+
+        private IComparable GetSatNicknameHeaderCell(IDataRowViewModel arg)
+        {
+            return (arg as SatelliteFilterDataRowViewModel)?.SatNickname ?? string.Empty;
+        }
+
+        private IComparable GetSatNameHeaderCell(IDataRowViewModel arg)
+        {
+            return (arg as SatelliteFilterDataRowViewModel)?.SatName ?? string.Empty;
+        }
+
+        private IComparable GetSatIdHeaderCell(IDataRowViewModel arg)
+        {
+            string value = (arg as SatelliteFilterDataRowViewModel)?.SatNo ?? string.Empty;
+            return value.PadLeft(5, '0');
+        }
+
+        private IComparable GetSelectedHeaderCell(IDataRowViewModel arg)
+        {
+            return arg is SatelliteFilterDataRowViewModel model && model.IsSelected;
+        }
+
+        public void HandleHeaderRowSelectAll(bool isSelected)
+        {
+            if (isSelected) HandleSelectAll();
+            else HandleDeselectAll();
+        }
+
+        private void HandleSelectAll()
+        {
+            int currentSelected = _satFilter.SelectedAssets.Count;
+            foreach (IDataRowViewModel dataRow in ParentGrid.DataSource)
+            {
+                if (currentSelected >= _assetListEditor.MaxSatCount) break;
+                if (!(dataRow is SatelliteFilterDataRowViewModel dataModel) || dataModel.IsSelected)
+                {
+                    continue;
+                }
+                // ReSharper disable once DelegateSubtraction
+                dataModel.OnPropertyChanged -= HandleViewModelChanged;
+                dataModel.IsSelected = true;
+                dataModel.OnPropertyChanged += HandleViewModelChanged;
+                currentSelected += 1;
+            }
+
+            _selectedToggle.onValueChanged.RemoveListener(HandleSelectAllValueChanged);
+            _selectedToggle.isOn = true;
+            _selectedToggle.onValueChanged.AddListener(HandleSelectAllValueChanged);
+        }
+
+        private void HandleDeselectAll()
+        {
+            List<SatelliteFilterDataRowViewModel> selectedDataRows = _satFilter.GetFilteredViewModels().OfType<SatelliteFilterDataRowViewModel>().ToList().Where(r => r.IsSelected == true).ToList();
+
+            foreach (IDataRowViewModel dataRow in selectedDataRows)
+            {
+                if (!(dataRow is SatelliteFilterDataRowViewModel dataModel))
+                {
+                    continue;
+                }
+                // ReSharper disable once DelegateSubtraction
+                dataModel.OnPropertyChanged -= HandleViewModelChanged;
+                dataModel.IsSelected = false;
+                dataModel.OnPropertyChanged += HandleViewModelChanged;
+            }
+        }
+
+        private void HandleGridDataSourceChanged()
+        {
+            foreach (SatelliteFilterDataRowViewModel viewModel in ParentGrid.DataSource.Select(da => da as SatelliteFilterDataRowViewModel))
+            {
+                if (viewModel != null)
+                {
+                    viewModel.OnPropertyChanged += HandleViewModelChanged;
+                }
+            }
+
+            _selectedToggle.onValueChanged.RemoveListener(HandleSelectAllValueChanged);
+            HandleHeaderSelectedToggle();
+            _selectedToggle.onValueChanged.AddListener(HandleSelectAllValueChanged);
+        }
+
+        private void HandleViewModelChanged(SatelliteFilterDataRowViewModel obj)
+        {
+            _selectedToggle.onValueChanged.RemoveListener(HandleSelectAllValueChanged);
+            HandleHeaderSelectedToggle();
+            _selectedToggle.onValueChanged.AddListener(HandleSelectAllValueChanged);
+        }
+
+        private void HandleHeaderSelectedToggle()
+        {
+            List<SatelliteFilterDataRowViewModel> filteredRows = _satFilter.GetFilteredViewModels().OfType<SatelliteFilterDataRowViewModel>().ToList();
+
+            bool allAssetsSelectedUnderMax = filteredRows.Count < _assetListEditor.MaxSatCount &&
+                filteredRows.Where(r => r.IsSelected == true).ToList().Count == filteredRows.Count;
+            bool maxSelected = filteredRows.Where(r => r.IsSelected == true).ToList().Count == _assetListEditor.MaxSatCount;
+
+            _selectedToggle.isOn = allAssetsSelectedUnderMax || maxSelected;
+        }
+
+        private void HandleSelectAllValueChanged(bool isSelected)
+        {
+            if (ParentGrid.DataSource == null)
+            {
+                return;
+            }
+
+            HandleHeaderRowSelectAll(isSelected);
+        }
+    }
+}
+
+
+
+
+
+
+
+
+
+
+40.55555
+
+
+
+
+
+
+logic to update dynamic fields
+
+            //bool useBackgroundOne = true;
+            //if (_dynamicInfoRows.Count > 0)
+            //{
+            //    for (int i = _dynamicInfoRows.Count - 1; i >= 0; i--)
+            //    {
+            //        Destroy(_dynamicInfoRows[i]);
+            //        _dynamicInfoRows.RemoveAt(i);
+            //    }
+            //}
+
+            ////go to the location of the sensor data
+            ////sample loop for going through and creating data rows for an asset
+            //for (int i = 0; i < 4; i++)
+            //{
+            //    GameObject newRow = Instantiate(_sensorInfoDataFieldPrefab, _detailsFieldPanel.transform);
+            //    newRow.FindAndGetComponent<TextMeshProUGUI>("KeyPanel/Key").text = $"New Key {i}";
+            //    newRow.FindAndGetComponent<TextMeshProUGUI>("ValuePanel/Value").text = $"New Value {i}";
+            //    newRow.transform.SetAsLastSibling();
+            //    if (useBackgroundOne)
+            //    {
+            //        newRow.GetComponent<BaselineStyleComponent>().ApplyBaselineStyleType(BaselineStyleType.Background1, _styleSheet);
+            //        useBackgroundOne = false;
+            //    }
+            //    else
+            //    {
+            //        newRow.GetComponent<BaselineStyleComponent>().ApplyBaselineStyleType(BaselineStyleType.Background2, _styleSheet);
+            //        useBackgroundOne = true;
+            //    }
+            //    _dynamicInfoRows.Add(newRow);
+            // }
+
+
+
+
+
+
+
+
+merge everything in and get to strategizing
+3 broken tests
+code smells
+bugs
+code coverage
+
+
+Sensor name thing
+look at background for sensor name
+
+
+range values straight from UDL,
+"range"
+
+prioritize moving alerts from client to server
+only calculate longitude for Geo objects
+
+
+
+
+GeocentricOrbit.cs
+line 139, add 1 to totalminutes
+
+
+
+
+
+
+
+
+want show neighborhood only for LEO, MEO, GEO, Geostationary, Polar
+    - hide for other regimes
+    - filter by the appropriate regime
+
+    button appears on right click and under the satinfowindow
+
+
+proximity alerts would want to include all tracked objects!!!!!!!!!!!
+
+
+remove show neighborhood from both locations
+
+
+
+            if (_targetSatelliteSummaryModel.Regime != Regime.Geo || _targetSatelliteSummaryModel.Regime != Regime.Geostationary)
+            {
+                _showNeighborhoodButton.gameObject.SetActive(false);
+            }
+            else _showNeighborhoodButton.gameObject.SetActive(true);
+
+
+layout group or form of anchoring
+
+            
 
 
 
@@ -603,18 +914,98 @@ How to work on programs when returning to my unit???
 
 
 
+group logos
+
+group text
+
+tip KeyPanel
+
+make first
+aspect ratio on first background with image,
+inside splash has container for all element 
+    ues anchors in there
+        anchors allow relative positioning
+        
+
+visual tool bug crashes things bug
+    alerts cause visual tools/unity to crash
+    steps to reproduce
+    resubscribing every time visibility toggled or when pressing on an alert/exiting the alert view
+    switching between Presentations
+    
+    no design required button
+update space cockpit (long drift through nps, long precalculated ...)
+
+scrolling in between notifications causes screen zoom instead of scrolling
+
+sun advantage not working in alert view
+exiting alert view no visual tools show up
+
+
+fix the notifications pop ups scrolling issues
+    raycast blocker
+    add image to content and have raycast
+    
+country utility
+
+
+
+app model handles data comint into space cockpit
+
+Content: vertical layout group (default)
+    content size fitter vert fit preffered
+    Items: Horizontal layout group
+    layout, content size fitter
+
+
+
+increase the width of the dropdown
+move to the right based on the screen width
+move local
+screen.width
+
+
+if all values are 0, sensor info window
+Include sensor Az el data in the Sensor info window details parentGrid
+range to default value now (all or only those without data)
+
+
+1. Include sensor data in the info detail tab
+2. Set range default or No data
+3. look into other issues...
+ - fix classification marking
+
+access level for udl? might have access level higher when accessing on SIPR
+check out that creating ground stations creates the view cones correctly
+
+
+z axis for sensor HandleViewModelChanged
+forward is z axis,
+
+
+east-west instead of north south
+
+z for the sensor face up on earth
+up on earth is earth y (up)
+
+cross product of _earth.gameobject.transform.up and groundNormal gives the rotation vector
+latitude is how much to rotate this angle
+
+get projection on the cross product of right and ground vectors
+dot product
 
 
 
 
 
+get projection of the earth right angle onto plane 
+focus on performance
 
+Diego Garcia - conical with different elevations
+Mugu - fan type sensor
 
-
-
-
-
-
+compare Space Cockpit performance to tarot.saberastor.com 
+Now they are using different technologies granted (WebGL vs native js/html) but there still should not be such a massive difference
 
 
 

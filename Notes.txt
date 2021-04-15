@@ -1009,4 +1009,565 @@ Now they are using different technologies granted (WebGL vs native js/html) but 
 
 
 
+make a ticket for the information simplification sensor details
+dropdown for asset list to populate data for simple sensor types
+
+
+Canott
+
+change UI Scaling to expand to fix issue with scaling in wide screens
+
+https://www.bhphotovideo.com/c/product/1502153-REG/logitech_920_009000_g815_lightsync_rgb_mechanical.html?gclid=Cj0KCQjwl9GCBhDvARIsAFunhsklWtHtDU_T4YzTA_KNl1tWws63Qz7HLoFI6z-tQPLQET-_94JnhY0aApp1EALw_wcB
+
+
+Steps to reproduce
+Expected behavior
+Actual behavior
+Video
+or screenshots
+
+making visual tools work independant of focus, link to that 
+blocked,
+
+------------------------------------------------------------------------------------------------------------
+Monday 22 March
+
+Fix cornders in the sensor/sat info windows
+
+To Do:
+Ground stations
+ground station bugs
+
+don't do loading screen buttong bug
+
+subscribe/unsubscribe
+
+
+1. WebGL optimization
+2. Fix corners in asset info windows
+3. 
+
+using Models.AppSettings;
+using UI.StyleSheet;
+using UnityEngine;
+using Zenject;
+
+namespace UI.ScCursor
+{
+	public class CursorController : MonoBehaviour, ICursorController
+	{
+		[Inject] private readonly IStyleSheet _styleSheet = default;
+		[Inject] private readonly IAppSettingsModel _appSettingsModel = default;
+
+		private readonly Vector2 _cursorHotspot = Vector2.zero;
+		private readonly Vector2 _clickCursorHotspot = new Vector2(0, 4);
+		private readonly CursorMode _cursorMode = CursorMode.ForceSoftware;
+		private CursorState _cursorState;
+
+		// Start is called before the first frame update
+		void Start()
+		{
+			RequestDefaultCursor();
+		}
+
+		public void RequestDefaultCursor()
+		{
+			Cursor.SetCursor(_styleSheet.DefaultCursorSprite, _cursorHotspot, _cursorMode);
+			_cursorState = CursorState.Default;
+		}
+
+		public void RequestClickCursor()
+		{
+			if (_appSettingsModel.ControlScheme.UseLeftHandedMouseControls) Cursor.SetCursor(_styleSheet.LeftClickCursorSprite, _clickCursorHotspot, _cursorMode);
+			else Cursor.SetCursor(_styleSheet.RightClickCursorSprite, _clickCursorHotspot, _cursorMode);
+
+			_cursorState = CursorState.Click;
+		}
+
+		public void RequestTooltipCursor()
+		{
+			if (_cursorState == CursorState.Click) return;
+
+			Cursor.SetCursor(_styleSheet.TooltipCursorSprite, _cursorHotspot, _cursorMode);
+			_cursorState = CursorState.Tooltip;
+		}
+
+	}
+}
+
+other fan type
+    Merritt Island
+    mugu
+
+Normal Cone done wording
+GSFC NCC
+SMM POCC
+'Azimuth Limit (Upper Right)
+
+
+
+vis/novis handling
+doesn't work for normal cones if weird azimuth values
+doesn't work for complex conical view cones
+doesn't work for fan type viewcones
+viewcone type tilted?
+
+
+
+
+
+elevation calculating correctly
+azimuth is incorrect
+
+
+
+asset vector (gs to sat)
+up vector
+normal vector
+
+1. project asset vecor onto normal vector plane
+find angle between up vector and projection
+    (make sure to check the signs of the angle)
+
+rotate the projection by the azimuth, if < 180, azimuth = 360 - azimuth
+
+
+
+first: calculate the elevation angle for the off sides of the frustum
+
+
+
+create plane between two vectors, get angle between two planes
+
+
+
+
+
+
+Get elevation rotation axis
+    Azimuth Lower right - Azimuth Lower left (abs dif) then divide by two
+    azimuth upper right on earth plane rotated by that angle around earth normal = elevation rotation axis
+
+    check direction for rotation (if < 180 + elevation angle on plane)
+
+
+generating 4 vecotrs,
+angle between lower right and lower left
+
+
+    get plane between side frustums, project 
+
+
+invert rotation axis signs
+apply range values
+
+test - Mugu and Delta 1 R/B 515
+
+
+
+
+put current curved sides on other sides of frustum
+revert curvew to around vertical for currently curved sides
+
+
+appointment
+thursday 25 march
+9:20 AM
+
+
+600mg ibeprophen
+biofreeze after workout
+
+
+
+
+
+
+
+Write down questions about interpretation of data
+
+
+
+autoproperty is like a field with get and set
+
+
+
+
+SensorPawn - 86
+ViewConeGenerator - 80
+SatellitePawn - 358
+
+
+
+
+fix the icon thing...
+
+
+
+Nav (san diego)
+
+sat 692 
+appears that sats over max range are showing visible instead of not.
+
+
+
+subscribe and unsubscribe issues
+toggle visibility performance bug
+
+branch = fixingmasssubscribeandunsubscribe
+
+UPDATE BATCH HIDE for gs if it works
+
+
+
+implement changes onto ground station
+memory leak on hide/show many presses
+
+
+when hidden has double the memory usage
+visible still has high use
+
+SelectedGroundstationdatarowviewmodel.ontimecontrollertimeUpdated()
+AssetList.isgroundstationHidden()'
+
+
+.withalpha(0) is transparent
+
+
+cameracontroller
+base.cameracontroller
+
+satpawn, 
+gs pawn,
+dynamic scaling componenets
+
+
+
+Branch: ToggleAllSatVisibilityBug
+
+show asset not working
+
+
+
+
+- cant bring visibility back on sats with toggle all
+- all visibility button is no longer updating
+
+
+
+
+
+        public bool TryShowSatellite(ISatelliteSummaryModel shownSat, bool withNotify = true)
+        {
+            bool didRemove = _hiddenSatelliteSummaryModels.Remove(shownSat);
+            if (didRemove && withNotify)
+            {
+                ComputeCombinedSatList();
+            }
+
+            return didRemove;
+        }
+
+        {
+            IEnumerable<ISensorModel> combined = _groundStationModels.Except(_hiddenGroundStationModels);
+            _computedGroundStationModels.SetCollection(combined);
+            OnPropertyChanged(nameof(ComputedGroundStationModels));
+        }
+
+
+
+        Models.Satellites.SatelliteDetailModel
+
+        ''
+
+
+
+- cant bring visibility back on sats with toggle all
+- all visibility button is no longer updating
+- visibility toggle hover affect is broken
+
+
+
+TextWrappingDropdown
+
+SelectedSatelliteHeaderRow
+
+        private void OnHeaderVisibilityClick()
+        {
+            if (ParentGrid is SelectedSatelliteDataGrid ssdg)
+            {
+                ssdg.OverrideAllRowVisibility(_isVisible);
+                _isVisible = !_isVisible;
+            }
+            if (ParentGrid?.DataSource.Count > 0)
+            {
+                _visibilityButton.interactable = true;
+                _backgroundImage.sprite = _isVisible ? _visibleSprite : _invisibleSprite;
+            }
+        }
+                public void UpdateVisibilityButton(bool isVisible)
+        {
+            if (ParentGrid?.DataSource.Count == 0)
+            {
+                _visibilityButton.interactable = false;
+                _isVisible = true;
+            }
+            else
+            {
+                _visibilityButton.interactable = true;
+            }
+            _backgroundImage.sprite = _isVisible ? _visibleSprite : _invisibleSprite;
+        }
+
+SelectedSatelliteDataGrid
+        public void OverrideAllRowVisibility(bool isVisible)
+        {
+			for (int i = 0; i < DataSource.Count; i++)
+            {
+				if (DataSource[i] is SelectedSatelliteDataRowViewModel ssdr) ssdr.RequestHide(isVisible, i == DataSource.Count - 1);
+            }
+        }
+
+SelectedSatelliteDataRowViewModel
+        public void RequestHide(bool isHidden, bool withNotify = true)
+        {
+            if (isHidden)
+            {
+                _activeAssetList?.TryHideSatellite(Model, withNotify);
+            }
+            else
+            {
+                _activeAssetList?.TryShowSatellite(Model, withNotify);
+            }
+        }
+
+AssetList
+        public bool TryHideSatellite(ISatelliteSummaryModel hiddenSat, bool withNotify = true)
+        {
+            if (!IsSatHidden(hiddenSat.SatNo))
+            {
+                _hiddenSatelliteSummaryModels.Add(hiddenSat);
+                if (withNotify) ComputeCombinedSatList();
+                return true;
+            }
+
+            return false;
+        }
+        public bool TryShowSatellite(ISatelliteSummaryModel shownSat, bool withNotify = true)
+        {
+            bool didRemove = _hiddenSatelliteSummaryModels.Remove(shownSat);
+            if (didRemove && withNotify)
+            {
+                ComputeCombinedSatList();
+            }
+
+            return didRemove;
+        }
+
+
+
+
+
+
+
+
+
+
+
+        private void OnHeaderVisibilityClick()
+        {
+            if (ParentGrid is SelectedSatelliteDataGrid ssdg)
+            {
+                ssdg.OverrideAllRowVisibility(_isVisible);
+                _isVisible = !_isVisible;
+            }
+            _backgroundImage.sprite = _isVisible ? _visibleSprite : _invisibleSprite;
+        }
+
+        public void UpdateVisibilityButton(bool isVisible)
+        {
+            _isVisible = isVisible;
+            _backgroundImage.sprite = _isVisible ? _visibleSprite : _invisibleSprite;
+        }
+
+
+
+satelliteDetailModel is holding all of the detail models, not clearing on asset list changes
+
+
+
+
+weak references
+garbage collection is not always running, which causes things to 
+store the detail model in another collection, bring back when going visible again.
+
+
+
+don't create strong reference in Appmodel
+hold onto reference 
+
+
+
+
+
+
+listen for GetSatelliteDetailModels
+update the detail models after that
+
+
+
+
+modify the summary model to have a flag for if there is missing data
+
+
+SelectedSatelliteDataRowViewModel
+163
+
+
+
+_________ be specific in what type you are providing to another service, be general with what you can accept__________
+accept___________
+___________________-
+____________________________________________-
+
+
+
+updating assets/getting data for one sat triggers it for everyone
+
+
+
+
+_storedSatelliteDetailModels are adding custom sat detaim models 2x (one with and one without)
+
+
+
+
+set camera mode takes in targets
+currently only the focused sat is passed in in most cases
+would want to pass in the active asset list and zoom based on that
+CameraMode.cs, public void _activeAssetList
+CameraController.cs
+
+CameraTransitionMode.cs
+    IsMoreZoomInNeeded - needs to look at the active asset list, not the Target
+    Sceneobjectzoomgroup needs to have the relevant objects
+
+
+    
+
+tickets to add things to save scene
+
+
+AppModel.StorededAssetLists
+
+
+_activeAssetList is being set before _assetLists[i] is being updated
+
+
+
+
+
+
+
+
+
+
+Ground Station Filters
+
+1. Create custom script for each of the filter elements
+2. Update GroundStationFilterUIPanel
+3. Create GroundStationAndFilter (currently only an or filter)
+4. Update the datasource for the Country filter for ground stations
+5. 
+
+
+
+12 April 2021
+Supra Coders meeting--------------------------------------------------------------------------------------------------------------
+working some angles to try to extend the program...
+    Retro for the Supra coders meeting
+    Wednesday 2:30
+Will send out a form, will ask for commanders emails
+
+Z prefix for career field, Jackie has info on that
+
+
+
+
+- need releasable
+- when to return equipment, will need to figure that out
+- possibility of one day a week??? talk to program team as well... Keeping space camp hardware.. Work with Delta 4?
+    Space camp is highlty flexible
+- will have a google for with questions...
+    https://docs.google.com/forms/d/e/1FAIpQLSfkLQNO86sKpg3-pKgZBZ-dUUxFBRn17epbFz7IOY2NKRtcVw/viewform?usp=sf_link
+- shoot a sentance to sam Kreimier with what we are working on, what the importance is...
+
+
+
+
+start with longitude filter
+
+
+
+
+
+
+Make a new dropdown
+add scsearchdropdown 
+
+
+
+
+need to generate alerts for searching with empty field????
+
+Asdfjkl2016$1994!
+
+
+updateAlertNotification
+    satCount > MaxSatCount && satCount != oldSatCount
+    || gsCount > MaxGsCount && gsCount != oldGsCount
+    || satCount > MaxSatCount && GsCount > MaxGsCount && oldSatCount <= MaxSatCount
+        || satCount > MaxSatCount && GsCount > MaxGsCount && oldGsCount <= MaxGsCount
+
+
+ - if gs or sats exceeds limit but wasn't before
+ - if now both exceed when only one before, or if only one exceeds when both before
+
+
+
+
+
+ if (satCount > MaxSatCount && satCount != oldSatCount)
+
+ else if ()
+
+
+
+
+
+Space Camp Final Retro --------------------------------------------------------------------------------------------------
+14 April 2021
+Sam Kreimier
+Delilah Alvarado
+
+
+Send message to sam Kreimier 
+    quick wins for guardians, cool sentances of experience???
+
+
+
+
+
+
+alert catalogue not updating when sats are deleted from the active asset list
+    they are updating when a new active asset list is saved in the edit asset list.
+
+
+
+
+    
+
+
+
+
 
